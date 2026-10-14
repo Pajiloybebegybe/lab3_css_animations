@@ -432,7 +432,16 @@ body {
 .a18 .hero > * { position: absolute; }
 
 /* --- IRON MAN --- */
-.ironman { left: 55px; width: 80px; height: 170px; }
+.ironman {
+  left: 55px; width: 80px; height: 170px;
+  animation: imFly 10s ease-in-out infinite;
+}
+@keyframes imFly {
+  0%, 15%   { transform: translateY(0); }       /* стоит ровно */
+  25%       { transform: translateY(0); }       /* руки разводит */
+  45%, 70%  { transform: translateY(-170px); }  /* взлетел, висит в воздухе */
+  88%, 100% { transform: translateY(0); }       /* мягко приземлился */
+}
 .ironman .head {
   left: 24px; top: 0; width: 32px; height: 32px;
   background: #e0a92b; border-radius: 7px 7px 11px 11px;
@@ -466,15 +475,17 @@ body {
   background: #c0392b; border-radius: 7px;
   transform-origin: 50% 6px;
 }
-.ironman .arm.left  { left: 2px;  animation: imArmL 5s ease-in-out infinite; }
-.ironman .arm.right { right: 2px; animation: imArmR 5s ease-in-out infinite; }
-@keyframes imArmL {
-  0%, 30%, 70%, 100% { transform: rotate(6deg); }
-  45%, 55%           { transform: rotate(50deg); }
+.ironman .arm.left  { left: 2px;  animation: imArmOutL 10s ease-in-out infinite; }
+.ironman .arm.right { right: 2px; animation: imArmOutR 10s ease-in-out infinite; }
+@keyframes imArmOutL {
+  0%, 12%   { transform: rotate(6deg); }
+  25%, 86%  { transform: rotate(45deg); }    /* A-поза */
+  100%      { transform: rotate(6deg); }
 }
-@keyframes imArmR {
-  0%, 30%, 70%, 100% { transform: rotate(-6deg); }
-  45%, 55%           { transform: rotate(-50deg); }
+@keyframes imArmOutR {
+  0%, 12%   { transform: rotate(-6deg); }
+  25%, 86%  { transform: rotate(-45deg); }
+  100%      { transform: rotate(-6deg); }
 }
 .ironman .arm::after {
   content: ""; position: absolute; left: 50%; bottom: 2px;
@@ -512,19 +523,28 @@ body {
   transform-origin: 50% 6px;
 }
 .cap .arm.right { right: 6px; transform: rotate(-8deg); }
+/* Левая рука Капитана поднимается — но НЕ одновременно со взлётом Iron Man.
+   Iron Man взлетает 2.5-4.5с. Cap начинает движение только в 4с. */
 .cap .arm.left {
   left: 6px; z-index: 3;
-  animation: capWalk 5s ease-in-out infinite;
+  animation: capRaise 10s ease-in-out infinite;
 }
-@keyframes capWalk {
-  0%, 100% { transform: rotate(12deg); }
-  50%      { transform: rotate(-4deg); }
+@keyframes capRaise {
+  0%, 40%   { transform: rotate(12deg); }     /* 0-4с: стоит */
+  48%, 85%  { transform: rotate(-170deg); }   /* 4.8-8.5с: рука поднята */
+  100%      { transform: rotate(12deg); }     /* 8.5-10с: опускает */
 }
-.cap .arm.left .shield {
+
+/* Щит — отдельный элемент. Базовая точка = центр вращения руки
+   (в .cap координатах это x=12.5, y=38). Анимация translate() компенсирует
+   положение ладони при повороте руки. */
+.cap .shield {
   position: absolute;
-  left: 50%; top: 2px;
+  left: 12.5px;
+  top: 38px;
   width: 50px; height: 50px;
   margin-left: -25px;
+  margin-top: -25px;
   border-radius: 50%;
   background: radial-gradient(circle,
       #2a5fbf 0 22%,
@@ -533,6 +553,24 @@ body {
       #f2f2f2 58% 76%,
       #c0392b 76% 100%);
   box-shadow: 0 0 0 2px #17356e, 0 0 14px rgba(80,150,255,.5);
+  z-index: 5;
+  animation: capShieldThrow 10s ease-in-out infinite;
+}
+@keyframes capShieldThrow {
+  /* Стоит на месте — синхронно с опущенной рукой */
+  0%, 40%   { transform: translate(-11.6px, 54.8px); }
+  /* Рука поднята — щит в ладони (следует за рукой) */
+  48%, 58%  { transform: translate(9.7px, -55.2px); }
+  /* Бросок вверх — быстро */
+  63%       { transform: translate(9.7px, -240px); }
+  /* Пик — 0.4 секунды, потом сразу падает */
+  67%       { transform: translate(9.7px, -255px); }
+  /* Быстрое падение обратно в ладонь */
+  72%       { transform: translate(9.7px, -55.2px); }
+  /* Держит щит на поднятой руке */
+  85%       { transform: translate(9.7px, -55.2px); }
+  /* Опускает руку вместе со щитом */
+  100%      { transform: translate(-11.6px, 54.8px); }
 }
 .cap .leg {
   top: 96px; width: 16px; height: 76px;
@@ -996,16 +1034,15 @@ body.paused *::after {
             </div>
 
             <!-- CAPTAIN AMERICA -->
-            <div class="hero cap">
-              <span class="leg left"></span>
-              <span class="leg right"></span>
-              <span class="arm right"></span>
-              <span class="arm left">
-                <span class="shield"></span>
-              </span>
-              <span class="torso"></span>
-              <span class="head"></span>
-            </div>
+<div class="hero cap">
+  <span class="leg left"></span>
+  <span class="leg right"></span>
+  <span class="arm right"></span>
+  <span class="arm left"></span>
+  <span class="shield"></span>
+  <span class="torso"></span>
+  <span class="head"></span>
+</div>
 
             <!-- HULK -->
             <div class="hero hulk">
@@ -1045,16 +1082,16 @@ body.paused *::after {
     </div>
 
     <div class="demo__info">
-      <h3>Что реализовано</h3>
-      <ul>
-        <li><b>Iron Man</b> — дуговой реактор и ладони пульсируют, руки разводятся наружу.</li>
-        <li><b>Captain America</b> — щит дочерний у левой руки, рука покачивается, щит двигается вместе с ней.</li>
-        <li><b>Hulk</b> — глаза и рот привязаны к голове, поднимает руки, открывает рот.</li>
-        <li><b>Thor</b> — молот дочерний у правой руки: ручка вверх в ладонь, при замахе молот уходит с рукой.</li>
-        <li>Сцена содрогается в момент удара — <code>@keyframes a18shake</code>.</li>
-        <li>Все элементы — чистый CSS, ни одной картинки.</li>
-      </ul>
-    </div>
+  <h3>Что реализовано</h3>
+  <ul>
+    <li><b>Iron Man</b> — стоит ровно, разводит руки в стороны и взлетает на 10-секундной хореографии, а затем плавно приземляется. Реактор на груди и ладонях пульсирует.</li>
+    <li><b>Captain America</b> — поднимает левую руку вверх, подбрасывает щит высоко в воздух, ждёт пик и ловит его обратно в руку.</li>
+    <li><b>Hulk</b> — глаза и рот привязаны к голове, поднимает руки, открывает рот, сцена содрогается.</li>
+    <li><b>Thor</b> — замахивается молотом, вызывает вспышку.</li>
+    <li>Все анимации синхронизированы: пока Iron Man в воздухе, Cap успевает бросить и поймать щит.</li>
+    <li>Все элементы — чистый CSS, ни одной картинки.</li>
+  </ul>
+</div>
   </div>
 </section>
 
