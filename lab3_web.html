@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ЛР №3 — Вариант 2 | CSS-анимации</title>
+<meta name="description" content="Лабораторная работа №3. Вариант 2: анимации 4, 5, 6, 18.">
+<style>
+@property --p { syntax: '<percentage>'; inherits: false; initial-value: 0%; }
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0d1117; --bg-2: #161b22; --card: #1c2333;
+  --line: #2a3345; --text: #e6edf3; --muted: #8b98ad;
+  --accent: #4a86c8; --accent-2: #e8447e;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Segoe UI', system-ui, Roboto, Arial, sans-serif;
+  background: var(--bg); color: var(--text);
+  line-height: 1.6; min-height: 100vh;
+}
+
+/* ============ ШАПКА ============ */
+.header {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(13, 17, 23, 0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--line);
+}
+.header__inner {
+  max-width: 1100px; margin: 0 auto; padding: 14px 24px;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; flex-wrap: wrap;
+}
+.logo { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 16px; }
+.logo__badge {
+  width: 32px; height: 32px; border-radius: 9px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  display: grid; place-items: center; font-size: 15px; color: #fff;
+}
+.nav { display: flex; gap: 6px; flex-wrap: wrap; }
+.nav a {
+  padding: 8px 14px; border-radius: 8px; color: var(--muted);
+  text-decoration: none; font-size: 14px; font-weight: 500;
+  transition: .2s; border: 1px solid transparent;
+}
+.nav a:hover { color: var(--text); background: var(--bg-2); border-color: var(--line); }
+
+/* ============ ГЕРОЙ ============ */
+.hero { max-width: 1100px; margin: 0 auto; padding: 70px 24px 40px; text-align: center; }
+.hero__tag {
+  display: inline-block; padding: 6px 14px; border-radius: 999px;
+  background: rgba(74, 134, 200, 0.12);
+  border: 1px solid rgba(74, 134, 200, 0.35);
+  color: #7fb0e0; font-size: 13px; font-weight: 600; margin-bottom: 18px;
+}
+.hero h1 { font-size: clamp(28px, 5vw, 44px); line-height: 1.15; margin-bottom: 14px; letter-spacing: -.5px; }
+.hero h1 span {
+  background: linear-gradient(135deg, #4a86c8, #e8447e);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.hero p { color: var(--muted); font-size: 16px; max-width: 640px; margin: 0 auto 28px; }
+.hero__badges { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+.badge {
+  padding: 8px 16px; border-radius: 10px; background: var(--card);
+  border: 1px solid var(--line); font-size: 13px; color: #b9c6da;
+}
+
+/* ============ СЕКЦИИ ============ */
+.section { max-width: 1100px; margin: 0 auto; padding: 60px 24px; border-top: 1px solid var(--line); }
+.section__head { margin-bottom: 32px; }
+.section__num {
+  display: inline-block; font-size: 13px; font-weight: 700;
+  color: var(--accent); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 8px;
+}
+.section h2 { font-size: clamp(22px, 3.5vw, 30px); margin-bottom: 10px; letter-spacing: -.3px; }
+.section__desc { color: var(--muted); font-size: 15px; max-width: 720px; }
+
+.demo {
+  display: grid; grid-template-columns: 1fr; gap: 28px;
+  background: var(--card); border: 1px solid var(--line);
+  border-radius: 18px; padding: 32px;
+}
+.demo__stage {
+  display: flex; justify-content: center; align-items: center;
+  min-height: 420px; border-radius: 14px; background: var(--bg-2);
+  padding: 24px; overflow: hidden;
+}
+.demo__info { border-top: 1px solid var(--line); padding-top: 24px; }
+.demo__info h3 { font-size: 16px; margin-bottom: 12px; color: #c9d6e8; }
+.demo__info ul { list-style: none; display: grid; gap: 8px; }
+.demo__info li { position: relative; padding-left: 26px; font-size: 14px; color: var(--muted); }
+.demo__info li::before {
+  content: ""; position: absolute; left: 0; top: 8px;
+  width: 10px; height: 10px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+}
+.demo__info code {
+  background: #0d1117; padding: 2px 7px; border-radius: 5px;
+  font-size: 12.5px; color: #9fe8ff; font-family: 'Consolas', 'Courier New', monospace;
+}
+
+/* ============================================================
+   АНИМАЦИЯ 4 — КОСМОНАВТ
+   ============================================================ */
+
+.a4 {
+  position: relative;
+  width: 400px;
+  height: 400px;
+  flex: none;
+  overflow: hidden;
+  border-radius: 50%;
+  background: radial-gradient(circle at 45% 40%, #075174, #03283f 75%);
+  box-shadow: 0 0 45px #009bd544;
+}
+
+.a4 .planet {
+  position: absolute;
+  width: 170px;
+  height: 170px;
+  top: 35px;
+  right: 25px;
+  overflow: hidden;
+  border-radius: 50%;
+  background: linear-gradient(120deg, #ffbf69, #f28b35 65%, #bd552a);
+  box-shadow: inset -17px -8px 22px #8e401e66;
+  animation: a4planetMove 6s ease-in-out infinite;
+  z-index: 1;
+}
+
+.a4 .cloud {
+  position: absolute;
+  height: 12px;
+  border-radius: 50%;
+  background: #ffd18b;
+}
+
+.a4 .cloud.c1 { width: 65px; top: 28px; left: 65px; }
+.a4 .cloud.c2 { width: 90px; top: 62px; left: -8px; background: #db702d; }
+.a4 .cloud.c3 { width: 75px; top: 91px; left: 52px; }
+
+@keyframes a4planetMove {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+.a4 .star {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 0 8px white;
+  z-index: 2;
+  animation: a4twinkle 2s ease-in-out infinite;
+}
+
+@keyframes a4twinkle {
+  0%, 100% { opacity: .3; transform: scale(.7); }
+  50% { opacity: 1; transform: scale(1.5); }
+}
+
+/* Космонавт */
+
+.a4 .astro {
+  position: absolute;
+  width: 240px;
+  height: 315px;
+  left: 30px;
+  top: 42px;
+  z-index: 4;
+  animation: a4float 4s ease-in-out infinite;
+}
+
+@keyframes a4float {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(-9px) rotate(2deg); }
+}
+
+.a4 .astro > * {
+  position: absolute;
+}
+
+/* Рюкзак — позади трубки и тела */
+
+.a4 .backpack {
+  width: 76px;
+  height: 106px;
+  top: 102px;
+  left: 118px;
+  border: 5px solid #c7d0d8;
+  border-radius: 17px;
+  background: linear-gradient(90deg, #9caebb, #edf1f3 50%, #a5b5c2);
+  z-index: 1;
+}
+
+.a4 .backpack::before {
+  content: "";
+  position: absolute;
+  top: 12px;
+  left: 7px;
+  width: 52px;
+  height: 30px;
+  border-radius: 7px;
+  background: #536b7e;
+  border: 3px solid #f1f4f5;
+}
+
+.a4 .backpack::after {
+  content: "";
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  width: 40px;
+  height: 8px;
+  border-radius: 4px;
+  background: #ff755d;
+}
+
+/* Шланг: соединение со шлемом и вход в рюкзак.
+   Основная дуга находится позади тела и рук. */
+
+.a4 .tube-svg {
+  position: absolute;
+  inset: 0;
+  width: 240px;
+  height: 315px;
+  z-index: 2;
+  overflow: visible;
+  pointer-events: none;
+  filter: drop-shadow(0 2px 2px #0006);
+}
+
+/* Тело */
+
+.a4 .torso {
+  position: absolute;
+  z-index: 4;
+  left: 66px;
+  top: 105px;
+  width: 100px;
+  height: 122px;
+  border: 5px solid #cbd4da;
+  border-radius: 29px 29px 22px 22px;
+  background: linear-gradient(110deg, #e5e9eb, #fff 48%, #d4dce1);
+}
+
+.a4 .control-panel {
+  position: absolute;
+  top: 35px;
+  left: 23px;
+  width: 46px;
+  height: 30px;
+  border: 3px solid #aebbc4;
+  border-radius: 7px;
+  background: #52677a;
+}
+
+.a4 .light {
+  position: absolute;
+  top: 7px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+.a4 .light.blue { left: 5px; background: #48a4ff; }
+.a4 .light.yellow { left: 16px; background: #ffda45; }
+.a4 .light.red { left: 27px; background: #ff6657; }
+
+/* Шея и шлем */
+
+.a4 .neck {
+  z-index: 5;
+  width: 37px;
+  height: 17px;
+  top: 83px;
+  left: 97px;
+  border-radius: 6px;
+  background: #cbd4da;
+}
+
+.a4 .helmet {
+  z-index: 7;
+  width: 100px;
+  height: 92px;
+  top: 23px;
+  left: 65px;
+  border: 7px solid #d0d8de;
+  border-radius: 48% 48% 45% 45%;
+  background: linear-gradient(130deg, #fff, #dbe2e7);
+}
+
+/* Соединение шланга с правой стороной шлема */
+
+
+
+.a4 .visor {
+  position: absolute;
+  inset: 9px;
+  border: 3px solid #aab9c4;
+  border-radius: 48%;
+  background: linear-gradient(140deg, #758b9b, #263c50 70%);
+  overflow: hidden;
+}
+
+.a4 .visor::before {
+  content: "";
+  position: absolute;
+  top: 8px;
+  left: 12px;
+  width: 22px;
+  height: 9px;
+  border-radius: 50%;
+  background: #c6e6f7;
+  opacity: .8;
+  transform: rotate(-35deg);
+}
+
+.a4 .visor::after {
+  content: "";
+  position: absolute;
+  right: 8px;
+  bottom: 9px;
+  width: 13px;
+  height: 24px;
+  border-radius: 50%;
+  background: #526d81;
+  transform: rotate(-25deg);
+}
+
+/* Руки */
+
+.a4 .limb {
+  border: 4px solid #cbd4da;
+  background: linear-gradient(90deg, #d7dfe4, #fff, #d2dce2);
+}
+
+.a4 .arm-l,
+.a4 .arm-r {
+  z-index: 5;
+  top: 112px;
+  width: 34px;
+  height: 78px;
+  border-radius: 18px;
+  transform-origin: 50% 15%;
+}
+
+.a4 .arm-l {
+  left: 45px;
+  transform: rotate(28deg);
+  animation: a4armLeft 3s ease-in-out infinite;
+}
+
+.a4 .arm-r {
+  left: 151px;
+  transform: rotate(-30deg);
+  animation: a4armRight 3.5s ease-in-out infinite;
+}
+
+@keyframes a4armLeft {
+  0%, 100% { rotate: -4deg; }
+  50% { rotate: 7deg; }
+}
+
+@keyframes a4armRight {
+  0%, 100% { rotate: 4deg; }
+  50% { rotate: -6deg; }
+}
+
+/* Варежки с большим пальцем — без красных полос */
+
+.a4 .glove {
+  position: absolute;
+  width: 38px;
+  height: 36px;
+  bottom: -20px;
+  left: -6px;
+  border: 3px solid #cbd4da;
+  border-radius: 48% 48% 42% 42%;
+  background: #f7f8f8;
+}
+
+.a4 .glove::before {
+  content: "";
+  position: absolute;
+  width: 15px;
+  height: 21px;
+  left: -9px;
+  top: 4px;
+  border: 3px solid #cbd4da;
+  border-radius: 12px;
+  background: #f7f8f8;
+  transform: rotate(-28deg);
+}
+
+/* Ноги и ботинки */
+
+.a4 .leg-l,
+.a4 .leg-r {
+  z-index: 3;
+  top: 205px;
+  width: 40px;
+  height: 69px;
+  border: 4px solid #cbd4da;
+  border-radius: 13px 13px 10px 10px;
+  background: linear-gradient(90deg, #d6dfe4, #fff, #d6dfe4);
+  transform-origin: 50% 5%;
+}
+
+.a4 .leg-l {
+  left: 78px;
+  transform: rotate(8deg);
+  animation: a4legLeft 3.7s ease-in-out infinite;
+}
+
+.a4 .leg-r {
+  left: 119px;
+  transform: rotate(-9deg);
+  animation: a4legRight 4s ease-in-out infinite;
+}
+
+@keyframes a4legLeft {
+  0%, 100% { rotate: 5deg; }
+  50% { rotate: -3deg; }
+}
+
+@keyframes a4legRight {
+  0%, 100% { rotate: -5deg; }
+  50% { rotate: 5deg; }
+}
+
+.a4 .boot {
+  position: absolute;
+  bottom: -5px;
+  left: -7px;
+  width: 45px;
+  height: 23px;
+  border: 3px solid #b9c5cd;
+  border-radius: 8px 12px 7px 7px;
+  background: #f6f8f9;
+}
+
+.a4 .boot::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 1px;
+  width: 100%;
+  height: 5px;
+  border-radius: 3px;
+  background: #ff755d;
+}
+
+@media (max-width: 700px) {
+  .a4 {
+    width: 320px;
+    height: 320px;
+  }
+
+  .a4 .astro {
+    transform-origin: top left;
+    scale: .8;
+    left: 12px;
+    top: 32px;
+  }
+
+  .a4 .astro {
+    animation-name: a4floatSmall;
+  }
+
+  @keyframes a4floatSmall {
+    0%, 100% { translate: 0 0; rotate: -2deg; }
+    50% { translate: 0 -7px; rotate: 2deg; }
+  }
+}
+
+/* ============================================================
+   АНИМАЦИЯ 5 — ЛИНИИ
+   ============================================================ */
+.a5 {
+  position: relative; width: 260px; height: 260px;
+  overflow: hidden; border-radius: 14px; flex: none;
+  box-shadow: 0 8px 30px rgba(0,0,0,.35);
+  animation: a5bg 10s ease-in-out infinite;
+}
+@keyframes a5bg {
+  0%,  45%  { background: #2b2b2b; }
+  58%, 82%  { background: #c2185b; }
+  95%, 100% { background: #2b2b2b; }
+}
+.a5 .line {
+  position: absolute; left: 50%; top: 50%;
+  width: 150px; height: 5px; margin: -2.5px 0 0 -75px;
+  border-radius: 3px; background: #e8447e; z-index: 3;
+}
+.a5 .l-top { animation: a5top 10s cubic-bezier(.65,0,.35,1) infinite; }
+.a5 .l-bot { animation: a5bot 10s cubic-bezier(.65,0,.35,1) infinite; }
+.a5 .l-mid { animation: a5mid 10s cubic-bezier(.65,0,.35,1) infinite; }
+@keyframes a5top {
+  0%,  12%  { transform: translateY(-48px) rotate(0deg);  background: #e8447e; }
+  28%, 84%  { transform: translateY(0)     rotate(45deg); background: #ffffff; }
+  96%, 100% { transform: translateY(-48px) rotate(0deg);  background: #e8447e; }
+}
+@keyframes a5bot {
+  0%,  12%  { transform: translateY(48px) rotate(0deg);   background: #e8447e; }
+  28%, 84%  { transform: translateY(0)    rotate(-45deg); background: #ffffff; }
+  96%, 100% { transform: translateY(48px) rotate(0deg);   background: #e8447e; }
+}
+@keyframes a5mid {
+  0%,  16%  { transform: translate(0, 0);      opacity: 1; }
+  34%, 86%  { transform: translate(130px, 0);  opacity: 0; }
+  96%, 100% { transform: translate(0, 0);      opacity: 1; }
+}
+.a5 .ring {
+  position: absolute; left: 50%; top: 50%;
+  width: 170px; height: 170px; margin: -85px 0 0 -85px;
+  border-radius: 50%;
+  background: conic-gradient(from -90deg, #ffffff calc(var(--p)), transparent 0);
+  -webkit-mask: radial-gradient(farthest-side, #0000 calc(100% - 3px), #000 0);
+          mask: radial-gradient(farthest-side, #0000 calc(100% - 3px), #000 0);
+  animation: a5ring 10s linear infinite; z-index: 2;
+}
+@keyframes a5ring {
+  0%,  40%  { --p: 0%; }
+  66%, 88%  { --p: 100%; }
+  96%, 100% { --p: 0%; }
+}
+
+/* ============================================================
+   АНИМАЦИЯ 6 — ТОЧКИ (замедлено, с паузами)
+   ============================================================ */
+.a6 {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 16px; width: 240px; height: 240px; background: #0a0a0a;
+  border-radius: 14px; flex: none; box-shadow: 0 8px 30px rgba(0,0,0,.4);
+}
+.a6 .dot {
+  width: 15px; height: 15px; border-radius: 50%;
+  background: #ffffff; box-shadow: 0 0 10px rgba(255,255,255,.5);
+  transform: translateX(var(--x0));
+  animation: a6dot 10s cubic-bezier(.45,0,.55,1) infinite;
+  animation-delay: calc(var(--i) * .12s);
+}
+@keyframes a6dot {
+  0%   { transform: translateX(var(--x0)); }
+  10%  { transform: translateX(var(--x0)); }
+  28%  { transform: translateX(0); }
+  44%  { transform: translateX(0); }
+  58%  { transform: translateX(var(--x0)); }
+  68%  { transform: translateX(var(--x0)); }
+  82%  { transform: translateX(var(--x1)); }
+  92%  { transform: translateX(var(--x1)); }
+  100% { transform: translateX(var(--x0)); }
+}
+
+/* ============================================================
+   АНИМАЦИЯ 18 — MARVEL
+   ============================================================ */
+.a18 {
+  position: relative; width: 600px; height: 440px; flex: none;
+  overflow: hidden; border-radius: 16px;
+  background: linear-gradient(180deg, #0a1628 0%, #132a42 58%, #1b3a52 100%);
+  box-shadow: 0 8px 30px rgba(0,0,0,.5);
+}
+.a18 .scene { position: absolute; inset: 0; animation: a18shake 5s ease-in-out infinite; }
+@keyframes a18shake {
+  0%,  48%, 88%, 100% { transform: translate(0, 0) rotate(0deg); }
+  54% { transform: translate(-8px, 3px)  rotate(-.7deg); }
+  60% { transform: translate(8px, -4px)  rotate(.7deg); }
+  66% { transform: translate(-7px, 2px)  rotate(-.5deg); }
+  72% { transform: translate(7px, -3px)  rotate(.5deg); }
+  78% { transform: translate(-5px, 2px)  rotate(-.3deg); }
+  84% { transform: translate(5px, 0)     rotate(0deg); }
+}
+.a18 .ground {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 85px;
+  background: linear-gradient(180deg, #24506b, #16324a);
+  border-top: 3px solid #2f6a8e;
+}
+.a18 .flash {
+  position: absolute; inset: 0; background: #cfe9ff; opacity: 0;
+  pointer-events: none; z-index: 20;
+  animation: a18flash 5s linear infinite;
+}
+@keyframes a18flash {
+  0%, 23%, 30%, 100% { opacity: 0; }
+  24% { opacity: .65; } 25% { opacity: 0; }
+  26% { opacity: .45; } 27% { opacity: 0; }
+}
+.a18 .hero { position: absolute; bottom: 85px; }
+.a18 .hero > * { position: absolute; }
+
+/* --- IRON MAN (руки разводятся НАРУЖУ) --- */
+.ironman { left: 55px; width: 80px; height: 170px; }
+.ironman .head {
+  left: 24px; top: 0; width: 32px; height: 32px;
+  background: #e0a92b; border-radius: 7px 7px 11px 11px;
+  box-shadow: inset 0 9px 0 #b8322a;
+}
+.ironman .head::before, .ironman .head::after {
+  content: ""; position: absolute; top: 15px;
+  width: 9px; height: 4px; border-radius: 2px;
+  background: #9fe8ff; box-shadow: 0 0 7px #6fd8ff;
+  animation: arcGlow 1.8s ease-in-out infinite;
+}
+.ironman .head::before { left: 4px; }
+.ironman .head::after  { right: 4px; }
+.ironman .torso {
+  left: 16px; top: 30px; width: 48px; height: 72px;
+  background: #c0392b; border-radius: 11px;
+}
+.ironman .torso::after {
+  content: ""; position: absolute; left: 50%; top: 12px;
+  width: 16px; height: 16px; margin-left: -8px;
+  border-radius: 50%; background: #cfefff;
+  box-shadow: 0 0 12px #7fd4ff;
+  animation: arcGlow 1.8s ease-in-out infinite;
+}
+@keyframes arcGlow {
+  0%, 100% { opacity: .55; box-shadow: 0 0 6px #7fd4ff; }
+  50%      { opacity: 1;   box-shadow: 0 0 20px #b9ecff; }
+}
+.ironman .arm {
+  top: 34px; width: 14px; height: 66px;
+  background: #c0392b; border-radius: 7px;
+  transform-origin: 50% 6px;
+}
+.ironman .arm.left  { left: 2px;  animation: imArmL 5s ease-in-out infinite; }
+.ironman .arm.right { right: 2px; animation: imArmR 5s ease-in-out infinite; }
+@keyframes imArmL {
+  0%, 30%, 70%, 100% { transform: rotate(6deg); }
+  45%, 55%           { transform: rotate(50deg); }
+}
+@keyframes imArmR {
+  0%, 30%, 70%, 100% { transform: rotate(-6deg); }
+  45%, 55%           { transform: rotate(-50deg); }
+}
+.ironman .arm::after {
+  content: ""; position: absolute; left: 50%; bottom: 2px;
+  width: 10px; height: 10px; margin-left: -5px;
+  border-radius: 50%; background: #cfefff;
+  box-shadow: 0 0 9px #8fe0ff;
+}
+.ironman .leg {
+  top: 100px; width: 16px; height: 70px;
+  background: #c0392b; border-radius: 6px;
+}
+.ironman .leg.left  { left: 20px; }
+.ironman .leg.right { right: 20px; }
+
+/* --- CAPTAIN AMERICA (щит привязан к левой руке) --- */
+.cap { left: 165px; width: 90px; height: 172px; }
+.cap .head {
+  left: 30px; top: 0; width: 30px; height: 30px;
+  border-radius: 50% 50% 45% 45%;
+  background: #f0c090;
+  box-shadow: inset 0 11px 0 #2a5fbf;
+}
+.cap .torso {
+  left: 21px; top: 28px; width: 48px; height: 70px;
+  border-radius: 11px; background: #2a5fbf;
+}
+.cap .torso::after {
+  content: "★"; position: absolute; left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 20px; line-height: 1; color: #fff;
+}
+.cap .arm {
+  top: 32px; width: 13px; height: 62px;
+  background: #2a5fbf; border-radius: 7px;
+  transform-origin: 50% 6px;
+}
+.cap .arm.right { right: 6px; transform: rotate(-8deg); }
+.cap .arm.left {
+  left: 6px; z-index: 3;
+  animation: capWalk 5s ease-in-out infinite;
+}
+@keyframes capWalk {
+  0%, 100% { transform: rotate(12deg); }
+  50%      { transform: rotate(-4deg); }
+}
+.cap .arm.left .shield {
+  position: absolute;
+  left: 50%; top: 2px;
+  width: 50px; height: 50px;
+  margin-left: -25px;
+  border-radius: 50%;
+  background: radial-gradient(circle,
+      #2a5fbf 0 22%,
+      #f2f2f2 22% 40%,
+      #c0392b 40% 58%,
+      #f2f2f2 58% 76%,
+      #c0392b 76% 100%);
+  box-shadow: 0 0 0 2px #17356e, 0 0 14px rgba(80,150,255,.5);
+}
+.cap .leg {
+  top: 96px; width: 16px; height: 76px;
+  background: #1f4a99; border-radius: 6px;
+}
+.cap .leg.left  { left: 24px; }
+.cap .leg.right { right: 24px; }
+
+/* --- HULK --- */
+.hulk { left: 275px; width: 150px; height: 232px; }
+.hulk .head {
+  left: 47px; top: 0; width: 56px; height: 50px;
+  border-radius: 16px 16px 14px 14px;
+  background: #6ab04c; box-shadow: inset 0 10px 0 #3f7a2c;
+}
+.hulk .head .eye {
+  position: absolute; top: 19px;
+  width: 9px; height: 5px; border-radius: 2px;
+  background: #d8ff9b; box-shadow: 0 0 6px #b6ff5c;
+  animation: hulkEye 5s ease-in-out infinite;
+}
+.hulk .head .eye.e1 { left: 11px; }
+.hulk .head .eye.e2 { right: 11px; }
+@keyframes hulkEye {
+  0%, 48%, 88%, 100% { opacity: .55; box-shadow: 0 0 5px #b6ff5c; }
+  56%, 78%           { opacity: 1;   box-shadow: 0 0 16px #d4ff7a; background: #eaffb0; }
+}
+.hulk .head .mouth {
+  position: absolute; left: 50%; top: 33px;
+  width: 22px; height: 5px; margin-left: -11px;
+  border-radius: 3px; background: #2a1414;
+  transform-origin: 50% 0;
+  animation: hulkMouth 5s ease-in-out infinite;
+}
+@keyframes hulkMouth {
+  0%, 44%, 88%, 100% { height: 5px;  width: 22px; margin-left: -11px; border-radius: 3px; background: #2a1414; }
+  56%, 78%           { height: 18px; width: 26px; margin-left: -13px; border-radius: 50%; background: #4a1010; }
+}
+.hulk .torso {
+  left: 20px; top: 44px; width: 110px; height: 110px;
+  border-radius: 34px 34px 26px 26px; background: #6ab04c;
+}
+.hulk .pants {
+  left: 30px; top: 142px; width: 90px; height: 46px;
+  border-radius: 12px 12px 6px 6px; background: #6b3fa0;
+}
+.hulk .arm {
+  top: 50px; width: 34px; height: 105px;
+  border-radius: 17px; background: #6ab04c;
+  transform-origin: 50% 10px;
+}
+.hulk .arm.left  { left: 2px;   animation: hulkArmL 5s ease-in-out infinite; }
+.hulk .arm.right { right: 2px;  animation: hulkArmR 5s ease-in-out infinite; }
+@keyframes hulkArmL {
+  0%, 44%, 88%, 100% { transform: rotate(6deg); }
+  56%, 78%           { transform: rotate(150deg); }
+}
+@keyframes hulkArmR {
+  0%, 44%, 88%, 100% { transform: rotate(-6deg); }
+  56%, 78%           { transform: rotate(-150deg); }
+}
+.hulk .leg {
+  top: 178px; width: 34px; height: 54px;
+  border-radius: 10px; background: #6b3fa0;
+}
+.hulk .leg.left  { left: 36px; }
+.hulk .leg.right { right: 36px; }
+
+/* --- THOR (молот в правой руке) --- */
+.thor { left: 465px; width: 90px; height: 175px; }
+.thor .cape {
+  left: 12px; top: 26px; width: 66px; height: 108px;
+  border-radius: 16px 16px 30px 30px; background: #b52d2d; z-index: 0;
+}
+.thor .head {
+  left: 30px; top: 4px; width: 30px; height: 30px;
+  border-radius: 50%; background: #f0c090; z-index: 2;
+}
+.thor .helmet {
+  left: 26px; top: 0; width: 38px; height: 18px;
+  border-radius: 18px 18px 0 0; background: #c9d2da; z-index: 3;
+}
+.thor .helmet::before, .thor .helmet::after {
+  content: ""; position: absolute; top: -12px;
+  width: 10px; height: 16px; background: #e6ecf2;
+  border-radius: 50% 50% 0 0;
+}
+.thor .helmet::before { left: -2px;  transform: rotate(-18deg); }
+.thor .helmet::after  { right: -2px; transform: rotate(18deg); }
+.thor .torso {
+  left: 21px; top: 32px; width: 48px; height: 68px;
+  border-radius: 11px; background: #2f4f8f; z-index: 1;
+}
+.thor .torso::after {
+  content: ""; position: absolute; left: 50%; top: 10px;
+  width: 18px; height: 18px; margin-left: -9px;
+  border-radius: 50%; background: #d9d9d9;
+}
+.thor .leg {
+  top: 96px; width: 16px; height: 76px;
+  border-radius: 6px; background: #3a5a92; z-index: 1;
+}
+.thor .leg.left  { left: 24px; }
+.thor .leg.right { right: 24px; }
+.thor .arm {
+  top: 34px; width: 13px; height: 60px;
+  border-radius: 7px; background: #2f4f8f;
+  transform-origin: 50% 6px; z-index: 2;
+}
+.thor .arm.left  { left: 6px;  transform: rotate(8deg); }
+.thor .arm.right {
+  right: 6px;
+  animation: thorArm 5s ease-in-out infinite;
+}
+@keyframes thorArm {
+  0%, 10%, 34%, 100% { transform: rotate(-10deg); }
+  18%, 26%           { transform: rotate(-125deg); }
+}
+/* Молот — на САМОМ КОНЦЕ руки (там, где ладонь = низ руки).
+   При любом повороте руки он остаётся в кисти. */
+.thor .arm.right .hammer {
+  position: absolute;
+  left: 200%;
+  top: calc(100% - 6px);            /* ровно на кончике руки */
+  width: 50px; height: 28px;
+  margin-left: -20px;
+  background: linear-gradient(180deg, #b8c4d0 0%, #93a0ad 55%, #7d8996 100%);
+  border-radius: 8px;
+  box-shadow:
+    inset 0 -3px 0 #6f7a85,
+    inset 0 3px 0 rgba(255,255,255,.25),
+    0 0 10px rgba(180,210,255,.15);
+  z-index: 3;
+  transform-origin: 50% 0%;      /* точка вращения — верх головки (у ручки) */
+  transform: rotate(-90deg);        /* меняй угол здесь: 90deg, -90deg, 180deg... */
+}
+/* ручка — короткая, идёт вверх от головки в ладонь */
+.thor .arm.right .hammer::before {
+  content: "";
+  position: absolute;
+  left: 50%; bottom: 100%;
+  width: 7px; height: 42px;
+  margin-left: -3.5px;
+  background: linear-gradient(90deg, #5a3a1c 0%, #8b5a2b 45%, #6b4423 100%);
+  border-radius: 3px 3px 0 0;
+  box-shadow: inset -1px 0 0 rgba(0,0,0,.3);
+}
+
+/* ============ ПОДВАЛ ============ */
+.footer {
+  border-top: 1px solid var(--line); padding: 40px 24px;
+  text-align: center; color: var(--muted); font-size: 13px;
+}
+.footer a { color: var(--accent); text-decoration: none; }
+.footer a:hover { text-decoration: underline; }
+
+/* ============ АДАПТИВ ============ */
+@media (max-width: 700px) {
+  .demo { padding: 20px; }
+  .demo__stage { min-height: 360px; padding: 16px; }
+  .a4 { width: 320px; height: 320px; transform: scale(.92); }
+  .a18 { transform: scale(.62); transform-origin: top center; height: 290px; margin-bottom: -150px; }
+  .a5 { width: 220px; height: 220px; }
+  .a6 { width: 200px; height: 200px; gap: 12px; }
+  .a6 .dot { width: 12px; height: 12px; }
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header__inner">
+    <div class="logo">
+      <span class="logo__badge">ЛР</span>
+      <span>Лабораторная №3</span>
+    </div>
+    <nav class="nav">
+      <a href="#a4">Космонавт</a>
+      <a href="#a5">Линии</a>
+      <a href="#a6">Точки</a>
+      <a href="#a18">Marvel</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <span class="hero__tag">Вариант 2</span>
+  <h1>CSS-анимации:<br><span>4, 5, 6, 18</span></h1>
+  <p>
+    Лабораторная работа №3 по дисциплине «Web-программирование».
+    Четыре анимации, выполненные только средствами HTML и CSS —
+    без JavaScript, фреймворков и изображений.
+  </p>
+  <div class="hero__badges">
+    <span class="badge">Только HTML + CSS</span>
+    <span class="badge">keyframes</span>
+    <span class="badge">transform</span>
+    <span class="badge">conic-gradient</span>
+    <span class="badge">@property</span>
+  </div>
+</section>
+
+<!-- ============================================================
+     АНИМАЦИЯ 4 — КОСМОНАВТ
+     ============================================================ -->
+<section class="section" id="a4">
+  <div class="section__head">
+    <span class="section__num">Анимация 4</span>
+    <h2>Космонавт в открытом космосе</h2>
+    <p class="section__desc">
+      Космонавт парит в открытом космосе. Шланг соединяет правую
+      часть шлема с верхней частью рюкзака. Звёзды мерцают.
+    </p>
+  </div>
+
+  <div class="demo">
+
+    <!-- Сцена с анимацией -->
+    <div class="demo__stage">
+      <div class="a4">
+
+        <div class="planet">
+          <span class="cloud c1"></span>
+          <span class="cloud c2"></span>
+          <span class="cloud c3"></span>
+        </div>
+
+        <!-- Звёзды -->
+        <i class="star" style="left:10%; top:20%; animation-delay:0s"></i>
+        <i class="star" style="left:24%; top:44%; animation-delay:.35s"></i>
+        <i class="star" style="left:7%; top:66%; animation-delay:.7s"></i>
+        <i class="star" style="left:30%; top:80%; animation-delay:1.05s"></i>
+        <i class="star" style="left:45%; top:10%; animation-delay:1.4s"></i>
+        <i class="star" style="left:52%; top:88%; animation-delay:.5s"></i>
+        <i class="star" style="left:20%; top:92%; animation-delay:1.8s"></i>
+        <i class="star" style="left:38%; top:30%; animation-delay:2.1s"></i>
+        <i class="star" style="left:14%; top:50%; animation-delay:.9s"></i>
+        <i class="star" style="left:40%; top:64%; animation-delay:1.6s"></i>
+        <i class="star" style="left:8%; top:88%; animation-delay:.2s"></i>
+        <i class="star" style="left:26%; top:12%; animation-delay:2.4s"></i>
+
+        <!-- Космонавт -->
+        <div class="astro">
+
+          <!-- Рюкзак -->
+          <span class="backpack"></span>
+
+          <!-- Шланг от шлема к рюкзаку -->
+          <svg class="tube-svg"
+               viewBox="0 0 240 315"
+               aria-hidden="true">
+            <path
+              d="M 164 68
+                 C 193 73, 198 92, 187 110
+                 C 178 124, 177 132, 177 145
+                 C 177 153, 177 157, 178 163
+                 L 178 176"
+              fill="none"
+              stroke="#245caa"
+              stroke-width="14"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M 164 68
+                 C 193 73, 198 92, 187 110
+                 C 178 124, 177 132, 177 145
+                 C 177 153, 177 157, 178 163
+                 L 178 176"
+              fill="none"
+              stroke="#4a91e8"
+              stroke-width="8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+
+          <!-- Руки -->
+          <span class="limb arm-l">
+            <span class="glove"></span>
+          </span>
+
+          <span class="limb arm-r">
+            <span class="glove"></span>
+          </span>
+
+          <!-- Ноги -->
+          <span class="limb leg-l">
+            <span class="boot"></span>
+          </span>
+
+          <span class="limb leg-r">
+            <span class="boot"></span>
+          </span>
+
+          <!-- Тело -->
+          <span class="torso">
+            <span class="control-panel">
+              <i class="light blue"></i>
+              <i class="light yellow"></i>
+              <i class="light red"></i>
+            </span>
+          </span>
+
+          <span class="neck"></span>
+
+          <!-- Шлем -->
+          <span class="helmet">
+            <span class="visor"></span>
+          </span>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Описание — отдельно от анимации -->
+    <div class="demo__info">
+      <h3>Что реализовано</h3>
+      <ul>
+        <li>
+          <b>Шланг из SVG:</b> изгибается от правой стороны шлема
+          к верхней части рюкзака.
+        </li>
+        <li>
+          <b>Планета и облака:</b> градиенты и отдельные элементы.
+        </li>
+        <li>
+          <b>12 звёзд:</b> мерцание с разными задержками.
+        </li>
+        <li>
+          <b>Полёт:</b> плавное движение космонавта с небольшим поворотом.
+        </li>
+        <li>
+          <b>Скафандр:</b> рюкзак, перчатки, ботинки и панель управления.
+        </li>
+      </ul>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============================================================
+     АНИМАЦИЯ 5
+     ============================================================ -->
+<section class="section" id="a5">
+  <div class="section__head">
+    <span class="section__num">Анимация 5</span>
+    <h2>Линии → крест → круг</h2>
+    <p class="section__desc">
+      Три горизонтальные полоски: верхняя и нижняя плавно перекрещиваются в
+      перпендикуляр, центральная уходит вправо и исчезает, затем отрисовывается
+      контур круга от 0° до 360° и меняется цвет фона.
+    </p>
+  </div>
+
+  <div class="demo">
+    <div class="demo__stage">
+      <div class="a5">
+        <span class="ring"></span>
+        <span class="line l-top"></span>
+        <span class="line l-mid"></span>
+        <span class="line l-bot"></span>
+      </div>
+    </div>
+
+    <div class="demo__info">
+      <h3>Что реализовано</h3>
+      <ul>
+        <li>Верхняя и нижняя полоски сходятся и поворачиваются на ±45°.</li>
+        <li>Центральная полоска сдвигается вправо и плавно исчезает (<code>opacity</code>).</li>
+        <li>Отрисовка круга: <code>conic-gradient</code> + кастомное свойство <code>--p</code>, анимируемое через <code>@property</code>.</li>
+        <li>Фон меняется с тёмно-серого <code>#2b2b2b</code> на малиновый <code>#c2185b</code> и обратно.</li>
+        <li>Полный цикл — 10 секунд, <code>cubic-bezier(.65,0,.35,1)</code> даёт плавность.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     АНИМАЦИЯ 6
+     ============================================================ -->
+<section class="section" id="a6">
+  <div class="section__head">
+    <span class="section__num">Анимация 6</span>
+    <h2>Точки: сближение → волна → возврат</h2>
+    <p class="section__desc">
+      Семь точек на тёмном фоне сначала плавно движутся навстречу друг другу с
+      замедлением, затем перестраиваются в волну, а после возвращаются в исходное
+      положение. Анимация замедлена и содержит паузы, чтобы каждое состояние
+      успевало «показаться».
+    </p>
+  </div>
+
+  <div class="demo">
+    <div class="demo__stage">
+      <div class="a6">
+        <span class="dot" style="--i:0; --x0:0px;   --x1:32px"></span>
+        <span class="dot" style="--i:1; --x0:24px;  --x1:26px"></span>
+        <span class="dot" style="--i:2; --x0:-24px; --x1:8px"></span>
+        <span class="dot" style="--i:3; --x0:24px;  --x1:-8px"></span>
+        <span class="dot" style="--i:4; --x0:-24px; --x1:-26px"></span>
+        <span class="dot" style="--i:5; --x0:24px;  --x1:-32px"></span>
+        <span class="dot" style="--i:6; --x0:0px;   --x1:-32px"></span>
+      </div>
+    </div>
+
+    <div class="demo__info">
+      <h3>Что реализовано</h3>
+      <ul>
+        <li>Каждая точка — круг 15×15 px с мягким свечением.</li>
+        <li>Позиции задаются CSS-переменными <code>--x0</code> (старт) и <code>--x1</code> (волна).</li>
+        <li>Задержка через <code>animation-delay: calc(var(--i) * .12s)</code> создаёт эффект бегущей волны.</li>
+        <li>Полный цикл — 10 секунд, с паузами: показали центр → показали волну → вернулись.</li>
+        <li>Фазы: старт (0–10%) → сближение (10–28%) → пауза (28–44%) → возврат (44–58%) → пауза (58–68%) → волна (68–82%) → пауза (82–92%) → возврат (92–100%).</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     АНИМАЦИЯ 18
+     ============================================================ -->
+<section class="section" id="a18">
+  <div class="section__head">
+    <span class="section__num">Анимация 18</span>
+    <h2>Персонажи Marvel</h2>
+    <p class="section__desc">
+      Четыре героя, собранных целиком из CSS-блоков. У каждого — своё «супер»
+      действие.
+    </p>
+  </div>
+
+  <div class="demo">
+    <div class="demo__stage">
+      <div class="a18">
+        <div class="scene">
+
+          <!-- IRON MAN -->
+          <div class="hero ironman">
+            <span class="leg left"></span>
+            <span class="leg right"></span>
+            <span class="arm left"></span>
+            <span class="arm right"></span>
+            <span class="torso"></span>
+            <span class="head"></span>
+          </div>
+
+          <!-- CAPTAIN AMERICA -->
+          <div class="hero cap">
+            <span class="leg left"></span>
+            <span class="leg right"></span>
+            <span class="arm right"></span>
+            <span class="arm left">
+              <span class="shield"></span>
+            </span>
+            <span class="torso"></span>
+            <span class="head"></span>
+          </div>
+
+          <!-- HULK -->
+          <div class="hero hulk">
+            <span class="leg left"></span>
+            <span class="leg right"></span>
+            <span class="pants"></span>
+            <span class="arm left"></span>
+            <span class="arm right"></span>
+            <span class="torso"></span>
+            <span class="head">
+              <span class="eye e1"></span>
+              <span class="eye e2"></span>
+              <span class="mouth"></span>
+            </span>
+          </div>
+
+          <!-- THOR -->
+          <div class="hero thor">
+            <span class="cape"></span>
+            <span class="leg left"></span>
+            <span class="leg right"></span>
+            <span class="arm left"></span>
+            <span class="arm right">
+              <span class="hammer"></span>
+            </span>
+            <span class="torso"></span>
+            <span class="head"></span>
+            <span class="helmet"></span>
+          </div>
+
+          <div class="ground"></div>
+        </div>
+
+        <div class="flash"></div>
+      </div>
+    </div>
+
+    <div class="demo__info">
+      <h3>Что реализовано</h3>
+      <ul>
+        <li><b>Iron Man</b> — дуговой реактор и ладони пульсируют, руки разводятся наружу.</li>
+        <li><b>Captain America</b> — щит теперь дочерний у левой руки, рука плавно покачивается, щит двигается вместе с ней.</li>
+        <li><b>Hulk</b> — глаза и рот привязаны к голове, поднимает руки, открывает рот.</li>
+        <li><b>Thor</b> — молот дочерний у правой руки: ручка идёт вверх в ладонь, при замахе молот уходит вместе с рукой.</li>
+        <li>Сцена содрогается в момент удара — <code>@keyframes a18shake</code>.</li>
+        <li>Все элементы — чистый CSS, ни одной картинки.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <p>Лабораторная работа №3 · Вариант 2 · Дисциплина «Web-программирование»</p>
+  <p style="margin-top:8px;">Выполнено только на HTML + CSS · 2026</p>
+</footer>
+
+</body>
+</html>
